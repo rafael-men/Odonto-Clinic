@@ -3,6 +3,7 @@ import prisma from './prisma';
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { enforceRateLimit, getClientIp, resetRateLimit } from "./rate-limit";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     trustHost: true,
@@ -15,21 +16,41 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 password: { label: "Senha", type: "password" },
             },
             async authorize(credentials) {
-                if (!credentials?.email || !credentials?.password) return null;
+                if(!credentials?.email || !credentials.password) {
+                    return null;
+                }
 
+                const email = String(credentials.email).trim().toLowerCase();
+                const ip = await getClientIp();
+
+                const blocked = await enforceRateLimit([
+                    {key: `login:ip:${ip}`,limit:30,windowSeconds:15*60},
+                    {key: `login:clinic:${email}`,limit:10,windowSeconds:15*60},
+                ]);
+                if(blocked) {
+                    return null;
+                }
+
+                // busca usuário e usa a autorização do rate-limit com base no email
                 const user = await prisma.user.findUnique({
-                    where: { email: credentials.email as string },
-                });
+                    where: {email: credentials.email as string}
+                })
 
-                if (!user || !user.password) return null;
+                if(!user || !user.password) {
+                    return null;
+                }
 
+                //validador de senha
                 const isValid = await bcrypt.compare(credentials.password as string, user.password);
-                if (!isValid) return null;
-
-                return { id: user.id, name: user.name, email: user.email, image: user.image };
-            },
+                if (!isValid) {
+                    return null;
+                }
+                await resetRateLimit(`login:clinic:${email}`);
+                return {id: user.id, name: user.name, email: user.email, image: user.image}
+            }
         }),
     ],
+    
     callbacks: {
         async signIn({ user, account }) {
             if (account?.provider === "google" && user.email) {

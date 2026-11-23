@@ -13,8 +13,8 @@ model Patient {
   name      String
   email     String  @unique
   phone     String?
-  password  String
-
+  password  String?
+  googleId  String? @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -175,4 +175,10 @@ model Authenticator {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
  
   @@id([userId, credentialID])
+}
+
+model RateLimit {
+  key String @id
+  count Int
+  resetAt DateTime
 }
