@@ -54,23 +54,34 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     callbacks: {
         async signIn({ user, account }) {
             if (account?.provider === "google" && user.email) {
-                const existing = await prisma.user.findUnique({
-                    where: { email: user.email },
-                });
+        const email = user.email.toLowerCase();
+        const existing = await prisma.user.findUnique({
+            where: { email },
+        });
 
-                if (!existing) {
-                    const created = await prisma.user.create({
-                        data: {
-                            email: user.email,
-                            name: user.name,
-                            image: user.image,
-                        },
-                    });
-                    user.id = created.id;
-                } else {
-                    user.id = existing.id;
-                }
+        if (!existing) {
+            const created = await prisma.user.create({
+                data: {
+                    email,
+                    name: user.name,
+                    image: user.image,
+                    emailVerified: new Date(),
+                },
+            });
+            user.id = created.id;
+        } else {
+            // Conta com senha que nunca foi verificada: a senha é removida ao vincular.
+            // Quem criou a conta com esse e-mail perde o acesso por senha.
+            const data: { password?: null; emailVerified?: Date } = {};
+            if (existing.password) data.password = null;
+            if (!existing.emailVerified) data.emailVerified = new Date();
+
+            if (Object.keys(data).length > 0) {
+                await prisma.user.update({ where: { id: existing.id }, data });
             }
+            user.id = existing.id;
+        }
+    }
             return true;
         },
         async jwt({ token, user, account }) {

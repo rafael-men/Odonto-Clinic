@@ -16,9 +16,6 @@ const sign = function (data: string): string {
    return createHmac('sha256', signinKey()).update(data).digest('base64url');
 }
 
-
-// Hash of the credential fields. Changing the password or linking Google
-// invalidates existing sessions. The raw values never go into the cookie.
 export function patientFingerprint(patient: {
    password: string | null;
    googleId: string | null;

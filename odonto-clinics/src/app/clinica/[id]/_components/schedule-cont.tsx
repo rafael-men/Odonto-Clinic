@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { ScheduleTime } from "./schedule-time";
 import { createAppointment } from "../_actions/create-appointment";
 import { useToast } from "@/components/toast-provider";
+import { toDateKey } from "@/lib/utils";
 import Link from "next/link";
 
 
@@ -97,15 +98,18 @@ export function ScheduleContent({clinica, patient}: scheduleContentProps) {
     const fetchBlockedTimes = useCallback(async (date: Date): Promise<string[]> => {
         setLoadingSlots(true);
         try {
-            const dateString = date.toISOString().split('T')[0];
+            const dateString = toDateKey(date)
             const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/schedule/appointments?userId=${clinica.id}&date=${dateString}`);
 
+            if (!response.ok) {
+                throw new Error(`Falha ao buscar horários: ${response.status}`);
+            }
+
             const json = await response.json();
-            setLoadingSlots(false);
             return Array.isArray(json) ? json : [];
         }
         catch(err) {
-            return [];
+            throw err;
         } finally {
             setLoadingSlots(false);
         }
@@ -133,6 +137,9 @@ export function ScheduleContent({clinica, patient}: scheduleContentProps) {
                 });
 
                 setAvTimeSlots(finalSlots);
+            }).catch(() => {
+                setBlockedTimes([]);
+                setAvTimeSlots([]);
             });
         }
     },[clinica.times, fetchBlockedTimes, selectedDate])
@@ -151,7 +158,8 @@ export function ScheduleContent({clinica, patient}: scheduleContentProps) {
                 email: FormData.email,
                 phone: FormData.phone,
                 time: selectedTime,
-                date: FormData.date.toISOString(),
+                // date: FormData.date.toISOString(),
+                date: toDateKey(FormData.date),
                 serviceId: FormData.serviceId,
                 clinicaId: clinica.id,
                 paymentForm: FormData.paymentForm,

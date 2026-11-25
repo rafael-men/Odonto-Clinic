@@ -10,7 +10,7 @@ const CreateAppointmentSchema = z.object({
     name: z.string().min(1, "O nome é obrigatório"),
     email: z.string().email("Email inválido"),
     phone: z.string().min(1, "O telefone é obrigatório"),
-    date: z.string().min(1, "A data é obrigatória"),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Data inválida"),
     time: z.string().min(1, "O horário é obrigatório"),
     serviceId: z.string().min(1, "O serviço é obrigatório"),
     clinicaId: z.string().min(1, "A clínica é obrigatória"),
@@ -30,10 +30,8 @@ export async function createAppointment(FormData: FormSchema) {
     }
 
     try {
-        const selectedDate = new Date(FormData.date)
-        const year = selectedDate.getFullYear();
-        const month = selectedDate.getMonth();
-        const day = selectedDate.getDate();
+        const [ year,monthNumber,day] = FormData.date.split('-').map(Number)
+        const month = monthNumber - 1
 
         const appointmentDate = new Date(year, month, day, 0, 0, 0, 0)
         const startOfDay = new Date(year, month, day, 0, 0, 0, 0)
