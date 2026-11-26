@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from "react";
-import { User } from "@/generated/prisma/client";
+import type { PublicClinic } from "@/app/_data_access/public-clinic.select";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,7 +11,7 @@ import { ClinicGridSkeleton } from "@/app/_components/clinic-card-skeleton";
 import { ClinicStatusBadge, isClinicOpen } from "@/app/_components/clinic-status-badge";
 
 interface Props {
-  professionals: User[];
+  professionals: PublicClinic[];
 }
 
 const TIME_OPTIONS = [

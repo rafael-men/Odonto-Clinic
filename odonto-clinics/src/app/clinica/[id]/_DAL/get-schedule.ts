@@ -1,36 +1,18 @@
 'use server'
 
 import prisma from "@/lib/prisma";
-import { use } from "react";
+import { clinicScheduleSelect } from "./clinic-schedule.select";
 
 export async function getInfoSchedule({userId}:{userId: string}) {
     try {
         if(!userId) {
             return null;
         }
-        else {
-            const user = await prisma.user.findFirst({
-                where: {
-                    id: userId
-                },
-                include: {
-                    services: {
-                        where: {
-                            status: true
-                        },
-                        include: {
-                            professional: true
-                        }
-                    }
-                }
-            })
 
-            if(!user) {
-                return null;
-            }
-
-            return user;
-        }
+        return await prisma.user.findFirst({
+            where: { id: userId },
+            select: clinicScheduleSelect,
+        });
     }
     catch(err) {
         throw err;

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Test from '../../../../../public/foto1.png';
 import { MapPin, Clock, DollarSign, CreditCard, QrCode, AlertCircle, Loader2, LogIn, User } from "lucide-react";
-import { Prisma } from "@/generated/prisma/client";
+import type { ClinicSchedule } from "../_DAL/clinic-schedule.select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -21,15 +21,7 @@ import Link from "next/link";
 
 
 
-type UserWithService = Prisma.UserGetPayload<{
-    include: {
-        services: {
-            include: {
-                professional: true
-            }
-        }
-    }
-}>
+type UserWithService = ClinicSchedule;
 
 interface scheduleContentProps {
     clinica: UserWithService;

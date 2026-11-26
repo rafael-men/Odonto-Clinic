@@ -1,17 +1,15 @@
 'use server'
 
 import prisma from "@/lib/prisma";
+import { requireOwnUserId } from "@/lib/authorization";
 
 export async function getServices({userId}: {userId: string}) {
-    if(!userId) {
-        throw new Error('Falha ao Buscar Serviços.');
-    }
+    const ownerId = await requireOwnUserId(userId);
 
     try {
-
         const services = await prisma.service.findMany({
             where: {
-                userId: userId,
+                userId: ownerId,
                 status: true
             },
             include: {
@@ -19,9 +17,9 @@ export async function getServices({userId}: {userId: string}) {
             }
         })
 
-            return {
-                data: services
-            }
+        return {
+            data: services
+        }
     }
     catch {
         throw new Error('Erro ao Buscar Serviços.');

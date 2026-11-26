@@ -4,6 +4,7 @@ import z from "zod";
 import {auth} from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { isOwnedProfessional } from "@/lib/professional-ownership";
 
 const formSchema = z.object({
     serviceId: z.string().min(1, {message: "ID do serviço é obrigatório"}),
@@ -26,6 +27,10 @@ export async function updateService(formData: FormSchemaType) {
 
     if(!schema.success) {
         return { success: false, error: "Dados inválidos" };
+    }
+
+    if (!(await isOwnedProfessional(schema.data.professionalId, session.user.id))) {
+        return { success: false, error: "Profissional inválido para esta clínica." };
     }
 
     try {

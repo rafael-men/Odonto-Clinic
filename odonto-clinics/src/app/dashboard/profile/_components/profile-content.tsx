@@ -1,13 +1,13 @@
 'use client'
 
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import Image from "next/image";
-import Foto from  '../../../../../public/dentista-concentrada-em-um-check-up-dentario_1153-666.jpg';
+import Foto from '../../../../../public/dentista-concentrada-em-um-check-up-dentario_1153-666.jpg';
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Loader2, DoorClosed, Camera } from "lucide-react";
 import { useState, useRef } from "react";
@@ -15,14 +15,15 @@ import { cn } from "@/lib/utils";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Prisma } from "@/generated/prisma/client";
+//import { Prisma } from "@/generated/prisma/client";
+import type { UserProfile } from "../_DAL/User-Profile-Select";
 import { updateProfile } from "../_actions/update_prof";
 import { updateProfileImage } from "../_actions/update-image";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/toast-provider";
 
-type User = Prisma.UserGetPayload<{}>;
+type User = UserProfile;
 
 
 const profileSchema = z.object({
@@ -49,7 +50,7 @@ interface ProfileContentProps {
     user: User;
 }
 
-export default function ProfileContent({user}: ProfileContentProps) {
+export default function ProfileContent({ user }: ProfileContentProps) {
     const router = useRouter();
     const { addToast } = useToast();
     const [selectedHours, setSelectedHours] = useState<string[]>(user.times ?? []);
@@ -59,7 +60,7 @@ export default function ProfileContent({user}: ProfileContentProps) {
     const [uploadingImage, setUploadingImage] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { update } = useSession();
-  
+
 
     const form = useForm({
         resolver: zodResolver(profileSchema),
@@ -109,23 +110,23 @@ export default function ProfileContent({user}: ProfileContentProps) {
     function generateTimeSlots() {
         const hours: string[] = [];
 
-        for (let i = 7;i<=24;i++) {
-           for(let j=0;j<2;j++) {
-            const hour = i.toString().padStart(2,'0');
-            const minute = (j*30).toString().padStart(2,'0');
-            hours.push(`${hour}:${minute}`);
-           }
+        for (let i = 7; i <= 24; i++) {
+            for (let j = 0; j < 2; j++) {
+                const hour = i.toString().padStart(2, '0');
+                const minute = (j * 30).toString().padStart(2, '0');
+                hours.push(`${hour}:${minute}`);
+            }
         }
 
         return hours;
     }
 
-    
+
 
     const hours = generateTimeSlots();
 
-     function toggleHour(hour: string) {
-        setSelectedHours((prevHours) => 
+    function toggleHour(hour: string) {
+        setSelectedHours((prevHours) =>
             prevHours.includes(hour) ? prevHours.filter(h => h !== hour) : [...prevHours, hour].sort())
     }
 
@@ -133,8 +134,8 @@ export default function ProfileContent({user}: ProfileContentProps) {
         zone.startsWith('America/Sao_Paulo') || zone.startsWith('America/Fortaleza') || zone.startsWith('America/Cuiaba') || zone.startsWith('America/Recife') || zone.startsWith('America/Manaus') || zone.startsWith('America/Rio_Branco')
     )
 
-    function formatCNPJ(value: string){
-        const numbers = value.replace(/\D/g, '').slice(0,14);
+    function formatCNPJ(value: string) {
+        const numbers = value.replace(/\D/g, '').slice(0, 14);
         return numbers
             .replace(/^(\d{2})(\d)/, '$1.$2')
             .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
@@ -143,18 +144,18 @@ export default function ProfileContent({user}: ProfileContentProps) {
     }
 
     function formatPhone(value: string) {
-    const numbers = value.replace(/\D/g, '').slice(0, 11);
-    
-    if (numbers.length <= 10) {
-        return numbers
-            .replace(/^(\d{2})(\d)/, '($1) $2')
-            .replace(/(\d{4})(\d)/, '$1-$2');
-    } else {
-        return numbers
-            .replace(/^(\d{2})(\d)/, '($1) $2')
-            .replace(/(\d{5})(\d)/, '$1-$2');
+        const numbers = value.replace(/\D/g, '').slice(0, 11);
+
+        if (numbers.length <= 10) {
+            return numbers
+                .replace(/^(\d{2})(\d)/, '($1) $2')
+                .replace(/(\d{4})(\d)/, '$1-$2');
+        } else {
+            return numbers
+                .replace(/^(\d{2})(\d)/, '($1) $2')
+                .replace(/(\d{5})(\d)/, '$1-$2');
+        }
     }
-}
 
     async function onSubmit(values: ProfileFormData) {
         setIsLoading(true);
@@ -220,59 +221,59 @@ export default function ProfileContent({user}: ProfileContentProps) {
                             <div className="space-y-4">
                                 <FormField control={form.control}
                                     name="name"
-                                    render={({field}) => (
+                                    render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="font-semibold">Nome</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder="Insira o nome da Clínica"  />
+                                                <Input {...field} placeholder="Insira o nome da Clínica" />
                                             </FormControl>
                                             <FormMessage />
-                                        </FormItem>    
+                                        </FormItem>
                                     )}
                                 />
                                 <FormField control={form.control}
                                     name="address"
-                                    render={({field}) => (
+                                    render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="font-semibold">Endereço</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder="Insira seu Endereço"  />
+                                                <Input {...field} placeholder="Insira seu Endereço" />
                                             </FormControl>
                                             <FormMessage />
-                                        </FormItem>    
+                                        </FormItem>
                                     )}
                                 />
-                                 <FormField control={form.control}
+                                <FormField control={form.control}
                                     name="cpf"
-                                    render={({field}) => (
+                                    render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="font-semibold">CNPJ</FormLabel>
                                             <FormControl>
                                                 <Input {...field} placeholder="Insira o CNPJ da clínica" onChange={(e) => field.onChange(formatCNPJ(e.target.value))} />
                                             </FormControl>
                                             <FormMessage />
-                                        </FormItem>    
+                                        </FormItem>
                                     )}
                                 />
                                 <FormField control={form.control}
                                     name="phone"
-                                    render={({field}) => (
+                                    render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="font-semibold">Telefone</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder="Insira seu Telefone" onChange={(e)=> field.onChange(formatPhone(e.target.value)) } />
+                                                <Input {...field} placeholder="Insira seu Telefone" onChange={(e) => field.onChange(formatPhone(e.target.value))} />
                                             </FormControl>
                                             <FormMessage />
-                                        </FormItem>    
+                                        </FormItem>
                                     )}
                                 />
                                 <div className="space-y-2 bg-white ">
                                     <Label className="font-semibold">Horários de funcionamento da Clínica</Label>
-                                    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}> 
+                                    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                                         <DialogTrigger asChild>
                                             <Button variant='outline' className="w-full justify-between">
                                                 Selecionar Horários
-                                                <ArrowRight className="w-5 h-5"/>
+                                                <ArrowRight className="w-5 h-5" />
                                             </Button>
                                         </DialogTrigger>
                                         <DialogContent>
@@ -285,35 +286,35 @@ export default function ProfileContent({user}: ProfileContentProps) {
                                                 <p className="text-sm text-muted-foreground mb-2">clique nos horários abaixos para marcar ou desmarcar</p>
                                                 <div className="grid grid-cols-5 gap-2">
                                                     {hours.map((hour) => (
-                                                        <Button type="button" key={hour} variant="outline" className={cn('border-2',selectedHours.includes(hour) && 'border-blue-600')} onClick={()=> toggleHour(hour)}>
+                                                        <Button type="button" key={hour} variant="outline" className={cn('border-2', selectedHours.includes(hour) && 'border-blue-600')} onClick={() => toggleHour(hour)}>
                                                             {hour}
                                                         </Button>
                                                     ))}
                                                 </div>
                                             </section>
-                                            <Button className="2-full bg-blue-600 text-white" type="button" onClick={()=> setDialogOpen(false)} >Fechar</Button>
+                                            <Button className="2-full bg-blue-600 text-white" type="button" onClick={() => setDialogOpen(false)} >Fechar</Button>
                                         </DialogContent>
                                     </Dialog>
                                 </div>
 
                                 <FormField control={form.control}
                                     name="timeZone"
-                                    render={({field}) => (
+                                    render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="font-semibold">Fuso Horário</FormLabel>
                                             <FormControl>
-                                                <Select  onValueChange={field.onChange} defaultValue={field.value ? 'active' : 'inactive'}>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value ? 'active' : 'inactive'}>
                                                     <SelectTrigger>
-                                                    <SelectValue placeholder="Selecione o fuso horário" {...field} />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {timeZones.map((zone) => (
-                                                        <SelectItem key={zone} value={zone}>{zone}</SelectItem>
-                                                    ))}
-                                                </SelectContent>  
-                                                </Select>                                          
+                                                        <SelectValue placeholder="Selecione o fuso horário" {...field} />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {timeZones.map((zone) => (
+                                                            <SelectItem key={zone} value={zone}>{zone}</SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
                                             </FormControl>
-                                        </FormItem>    
+                                        </FormItem>
                                     )}
                                 />
 
@@ -336,7 +337,7 @@ export default function ProfileContent({user}: ProfileContentProps) {
                                     className="w-full bg-red-500 text-white hover:bg-red-800 transition-colors"
                                     onClick={() => handleLogout()}
                                 >
-                                    <DoorClosed className="w-4 h-4"/>
+                                    <DoorClosed className="w-4 h-4" />
                                     Fazer Logout
                                 </Button>
                             </div>

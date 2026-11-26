@@ -1,30 +1,25 @@
 'use server'
 
-import prisma from "@/lib/prisma"
+import prisma from "@/lib/prisma";
+import { requireOwnUserId } from "@/lib/authorization";
+import { userProfileSelect } from "./User-Profile-Select";
 
 interface getUserProps {
     userId: string;
 }
 
-export default async function getUser({userId}: getUserProps) {
-    try {
-        if(!userId) {
-            return null;
-        }
-        const user = await prisma.user.findFirst({
-        where: {
-            id: userId
-        }
-      })
+export default async function getUser({ userId }: getUserProps) {
+    const ownerId = await requireOwnUserId(userId);
 
-      if(!user) {
-        return null;
-      }
-      else {
-        return user;    
-      }
+    try {
+        const user = await prisma.user.findFirst({
+            where: { id: ownerId },
+            select: userProfileSelect,
+        });
+
+        return user ?? null;
     }
     catch {
-        return null
+        return null;
     }
 }

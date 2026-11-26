@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { User } from "@/generated/prisma/client";
+import type { PublicClinic } from "@/app/_data_access/public-clinic.select";
 import { MapPin, Phone, Clock, ArrowRight, CalendarCheck } from "lucide-react";
 import Foto from "../../../public/dentista-concentrada-em-um-check-up-dentario_1153-666.jpg";
 import { ClinicGridSkeleton } from "./clinic-card-skeleton";
@@ -8,7 +8,7 @@ import { ClinicStatusBadge } from "./clinic-status-badge";
 import { Suspense } from "react";
 
 interface ProfessionalProps {
-  professionals: User[];
+  professionals: PublicClinic[];
   limit?: number;
 }
 

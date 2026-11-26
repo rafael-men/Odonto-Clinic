@@ -1,11 +1,11 @@
 'use server'
 
 import prisma from "@/lib/prisma";
+import { publicClinicSelect } from "./public-clinic.select";
 
 export async function getProfessionals() {
     try {
-        const professionals = await prisma.user.findMany()
-        return professionals;
+        return await prisma.user.findMany({ select: publicClinicSelect });
     } catch (error) {
         return [];
     }
