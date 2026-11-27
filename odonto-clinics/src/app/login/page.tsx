@@ -110,7 +110,7 @@ export default function LoginPage() {
                         />
                     </div>
 
-                    <Button type="submit" className="w-full" disabled={loading}>
+                    <Button type="submit" className="w-full bg-blue-600 text-white" disabled={loading}>
                         {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : mode === 'login' ? 'Entrar' : 'Criar conta'}
                     </Button>
                 </form>

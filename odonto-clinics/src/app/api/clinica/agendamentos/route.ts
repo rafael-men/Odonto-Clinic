@@ -32,7 +32,8 @@ export const GET = auth(async function GET(request) {
                 AppointmentDate: {
                     gte: startDate,
                     lte: endDate
-                }
+                },
+                status:{not:"cancelled"}
             },
             include : {
                 service: true,

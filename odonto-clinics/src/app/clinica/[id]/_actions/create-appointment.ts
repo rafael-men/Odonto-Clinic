@@ -48,7 +48,8 @@ export async function createAppointment(FormData: FormSchema) {
         const existingAppointments = await prisma.appointments.findMany({
             where: {
                 userId: FormData.clinicaId,
-                AppointmentDate: { gte: startOfDay, lte: endOfDay }
+                AppointmentDate: { gte: startOfDay, lte: endOfDay },
+                status: {not:"cancelled"},
             },
             include: { service: true }
         })

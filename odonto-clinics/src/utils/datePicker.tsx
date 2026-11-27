@@ -11,7 +11,7 @@ export function DateTimePicker() {
     return (
         <DatePicker
             selected={startDate}
-            onChange={(date) => setStartDate(date as Date)}
+            onChange={(date: Date | null) => { if (date) setStartDate(date); }}
             locale="pt-BR"
             showTimeSelect
             dateFormat="Pp"
