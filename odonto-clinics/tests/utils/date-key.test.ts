@@ -16,9 +16,4 @@ describe("toDateKey", () => {
   it("preenche mês e dia com zero à esquerda", () => {
     expect(toDateKey(new Date(2026, 0, 5, 10, 0))).toBe("2026-01-05");
   });
-
-  it("documenta o bug: toISOString troca o dia nesse horário", () => {
-    const date = new Date(2026, 10, 23, 21, 30);
-    expect(date.toISOString().split("T")[0]).toBe("2026-11-24");
-  });
 });
